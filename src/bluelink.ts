@@ -1,4 +1,4 @@
-import BlueLinky from "bluelinky";
+import { BlueLinky } from "bluelinky";
 import type { CarClient, ClimateOptions } from "./car.js";
 
 type Env = Record<string, string | undefined>;
