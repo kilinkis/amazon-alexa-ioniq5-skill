@@ -5,7 +5,10 @@ A private Alexa skill that controls a Hyundai (tested target: Ioniq 5, Europe) t
 > "Alexa, ask my ioniq to lock the car"
 > "Alexa, ask my ioniq to defrost the car"
 > "Alexa, ask my ioniq to warm up the car to 22 degrees"
+> "Alexa, ask my ioniq to cool down the car"
 > "Alexa, ask my ioniq to stop the climate"
+
+Warm, defrost and cool each have their own default target temperature (`WARM_TEMP_C`, `DEFROST_TEMP_C`, `COOL_TEMP_C`), and a temperature you say out loud overrides it (17 to 27 degrees). The Bluelink API only takes a target temperature, so "cool" simply uses a lower target and the car's automatic climate does the rest.
 
 Unlock is intentionally **not** implemented, see [Security](#security).
 

@@ -4,10 +4,16 @@ import { waitUntil } from "@vercel/functions";
 import { createBluelinkCar } from "../src/bluelink.js";
 import { createSkill } from "../src/skill.js";
 
+const num = (v?: string) => (v ? Number(v) : undefined);
+
 const skill = createSkill({
   getCar: createBluelinkCar(),
   keepAlive: waitUntil,
-  defaultTemperature: process.env.DEFAULT_TEMP_C ? Number(process.env.DEFAULT_TEMP_C) : undefined,
+  temperatures: {
+    warm: num(process.env.WARM_TEMP_C),
+    defrost: num(process.env.DEFROST_TEMP_C),
+    cool: num(process.env.COOL_TEMP_C),
+  },
 });
 
 // This endpoint controls a car, so it fails closed: it needs a valid Alexa signature AND a

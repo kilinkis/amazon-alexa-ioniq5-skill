@@ -20,7 +20,14 @@
             "defrost the windscreen",
             "defrost the windshield",
             "clear the windows",
-            "de ice the car"
+            "de ice the car",
+            "defrost the car to {temperature} degrees"
+          ],
+          "slots": [
+            {
+              "name": "temperature",
+              "type": "AMAZON.NUMBER"
+            }
           ]
         },
         {
@@ -40,6 +47,23 @@
             "start the climate at {temperature} degrees",
             "pre heat the car",
             "set the temperature to {temperature}"
+          ]
+        },
+        {
+          "name": "CoolCarIntent",
+          "slots": [
+            {
+              "name": "temperature",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "cool down the car",
+            "cool the car",
+            "cool down the car to {temperature} degrees",
+            "cool the car to {temperature} degrees",
+            "turn on the air conditioning",
+            "make the car cooler"
           ]
         },
         {

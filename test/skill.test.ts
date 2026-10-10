@@ -40,7 +40,7 @@ describe("skill", () => {
 
   it("defrosts with the default temperature", async () => {
     const car = fakeCar();
-    await createSkill({ getCar: async () => car, defaultTemperature: 22, climateDurationMin: 10 }).invoke(intent("DefrostCarIntent"));
+    await createSkill({ getCar: async () => car, temperatures: { defrost: 22 }, climateDurationMin: 10 }).invoke(intent("DefrostCarIntent"));
     expect(car.calls).toEqual([["start", { temperature: 22, defrost: true, durationMin: 10 }]]);
   });
 
@@ -49,7 +49,22 @@ describe("skill", () => {
     const skill = createSkill({ getCar: async () => car });
     await skill.invoke(intent("StartClimateIntent", "24"));
     await skill.invoke(intent("StartClimateIntent", "99"));
-    expect(car.calls.map((c) => (c[1] as { temperature: number }).temperature)).toEqual([24, 28]);
+    expect(car.calls.map((c) => (c[1] as { temperature: number }).temperature)).toEqual([24, 27]);
+  });
+
+  it("uses separate default temperatures per mode and lets speech override them", async () => {
+    const car = fakeCar();
+    const skill = createSkill({ getCar: async () => car, temperatures: { warm: 22, defrost: 24, cool: 18 } });
+    await skill.invoke(intent("StartClimateIntent"));
+    await skill.invoke(intent("DefrostCarIntent"));
+    await skill.invoke(intent("CoolCarIntent"));
+    await skill.invoke(intent("CoolCarIntent", "20"));
+    expect(car.calls.map((c) => c[1])).toEqual([
+      { temperature: 22, defrost: false, durationMin: 10 },
+      { temperature: 24, defrost: true, durationMin: 10 },
+      { temperature: 18, defrost: false, durationMin: 10 },
+      { temperature: 20, defrost: false, durationMin: 10 },
+    ]);
   });
 
   it("stops the climate", async () => {
@@ -84,6 +99,6 @@ describe("clampTemperature", () => {
   it("falls back for missing or invalid values", () => {
     expect(clampTemperature(undefined, 21)).toBe(21);
     expect(clampTemperature("?", 21)).toBe(21);
-    expect(clampTemperature("5", 21)).toBe(16);
+    expect(clampTemperature("5", 21)).toBe(17);
   });
 });

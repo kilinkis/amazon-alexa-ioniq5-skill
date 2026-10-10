@@ -5,14 +5,15 @@ export interface SkillDeps {
   getCar: () => Promise<CarClient>;
   /** Keeps a promise alive after the response is sent (e.g. Vercel's waitUntil). */
   keepAlive?: (promise: Promise<unknown>) => void;
-  defaultTemperature?: number;
+  /** Default target temperatures (Celsius) per mode; a spoken temperature overrides them. */
+  temperatures?: Partial<Record<"warm" | "defrost" | "cool", number>>;
   climateDurationMin?: number;
   /** Alexa gives up after 8s, so answer before that even if the car is slow. */
   responseTimeoutMs?: number;
 }
 
-export const MIN_TEMP = 16;
-export const MAX_TEMP = 28;
+export const MIN_TEMP = 17;
+export const MAX_TEMP = 27;
 
 export function clampTemperature(value: unknown, fallback: number): number {
   const n = Number(value);
@@ -23,7 +24,7 @@ export function clampTemperature(value: unknown, fallback: number): number {
 const TIMEOUT = Symbol("timeout");
 
 export function createSkill(deps: SkillDeps) {
-  const defaultTemp = deps.defaultTemperature ?? 21;
+  const temps = { warm: 21, defrost: 22, cool: 19, ...deps.temperatures };
   const duration = deps.climateDurationMin ?? 10;
   const timeoutMs = deps.responseTimeoutMs ?? 6000;
 
@@ -58,32 +59,33 @@ export function createSkill(deps: SkillDeps) {
     canHandle: (h) => Alexa.getRequestType(h.requestEnvelope) === "LaunchRequest",
     handle: (h) =>
       h.responseBuilder
-        .speak("What should I do? You can say lock the car, defrost the car, or warm up the car.")
+        .speak("What should I do? You can say lock the car, defrost the car, warm up the car, or cool down the car.")
         .reprompt("Lock, defrost, or warm up?")
         .getResponse(),
   };
 
   const lock = intent("LockCarIntent", (h) => run(h, (c) => c.lock(), "Locking the car."));
 
-  const defrost = intent("DefrostCarIntent", (h) =>
-    run(h, (c) => c.startClimate({ temperature: defaultTemp, defrost: true, durationMin: duration }), "Defrosting the car."),
-  );
+  /** Start the climate in one mode; a spoken temperature slot overrides the mode's default. */
+  const climateIntent = (name: string, mode: "warm" | "defrost" | "cool", defrost: boolean, verb: string) =>
+    intent(name, (h) => {
+      const temperature = clampTemperature(Alexa.getSlotValue(h.requestEnvelope, "temperature"), temps[mode]);
+      return run(
+        h,
+        (c) => c.startClimate({ temperature, defrost, durationMin: duration }),
+        `${verb} to ${temperature} degrees.`,
+      );
+    });
 
-  const climate = intent("StartClimateIntent", (h) => {
-    const slot = Alexa.getSlotValue(h.requestEnvelope, "temperature");
-    const temperature = clampTemperature(slot, defaultTemp);
-    return run(
-      h,
-      (c) => c.startClimate({ temperature, defrost: false, durationMin: duration }),
-      `Warming the car to ${temperature} degrees.`,
-    );
-  });
+  const defrost = climateIntent("DefrostCarIntent", "defrost", true, "Defrosting the car");
+  const climate = climateIntent("StartClimateIntent", "warm", false, "Warming the car");
+  const cool = climateIntent("CoolCarIntent", "cool", false, "Cooling the car");
 
   const stop = intent("StopClimateIntent", (h) => run(h, (c) => c.stopClimate(), "Stopping the climate."));
 
   const help = intent("AMAZON.HelpIntent", async (h) =>
     h.responseBuilder
-      .speak("You can say lock the car, defrost the car, warm up the car, or stop the climate.")
+      .speak("You can say lock the car, defrost the car, warm up the car, cool down the car, or stop the climate.")
       .reprompt("What should I do?")
       .getResponse(),
   );
@@ -95,5 +97,5 @@ export function createSkill(deps: SkillDeps) {
     handle: (h) => h.responseBuilder.speak("Goodbye").getResponse(),
   };
 
-  return Alexa.SkillBuilders.custom().addRequestHandlers(launch, lock, defrost, climate, stop, help, bye).create();
+  return Alexa.SkillBuilders.custom().addRequestHandlers(launch, lock, defrost, climate, cool, stop, help, bye).create();
 }
