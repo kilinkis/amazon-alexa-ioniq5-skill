@@ -1,13 +1,13 @@
 import { SkillRequestSignatureVerifier, TimestampVerifier } from "ask-sdk-express-adapter";
 import type { RequestEnvelope } from "ask-sdk-model";
 import { waitUntil } from "@vercel/functions";
-import { createBluelinkCar } from "../src/bluelink.js";
+import { hyundaiEuCarFromEnv } from "../src/hyundai-eu.js";
 import { createSkill } from "../src/skill.js";
 
 const num = (v?: string) => (v ? Number(v) : undefined);
 
 const skill = createSkill({
-  getCar: createBluelinkCar(),
+  getCar: hyundaiEuCarFromEnv(),
   keepAlive: waitUntil,
   temperatures: {
     warm: num(process.env.WARM_TEMP_C),
