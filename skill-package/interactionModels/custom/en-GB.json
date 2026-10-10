@@ -1,0 +1,69 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "my ioniq",
+      "intents": [
+        {
+          "name": "LockCarIntent",
+          "samples": [
+            "lock the car",
+            "lock the doors",
+            "lock my car",
+            "lock it"
+          ]
+        },
+        {
+          "name": "DefrostCarIntent",
+          "samples": [
+            "defrost the car",
+            "defrost my car",
+            "defrost the windscreen",
+            "defrost the windshield",
+            "clear the windows",
+            "de ice the car"
+          ]
+        },
+        {
+          "name": "StartClimateIntent",
+          "slots": [
+            {
+              "name": "temperature",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "warm up the car",
+            "warm up the car to {temperature} degrees",
+            "heat the car",
+            "heat the car to {temperature} degrees",
+            "start the climate",
+            "start the climate at {temperature} degrees",
+            "pre heat the car",
+            "set the temperature to {temperature}"
+          ]
+        },
+        {
+          "name": "StopClimateIntent",
+          "samples": [
+            "stop the climate",
+            "stop heating",
+            "turn off the climate",
+            "stop warming the car"
+          ]
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        }
+      ]
+    }
+  }
+}

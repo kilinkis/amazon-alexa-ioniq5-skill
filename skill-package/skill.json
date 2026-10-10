@@ -1,0 +1,36 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "name": "My Ioniq",
+          "summary": "Lock your Hyundai and start its climate.",
+          "description": "Private skill that locks your Hyundai and starts the climate or defroster through Bluelink.",
+          "examplePhrases": [
+            "Alexa, ask my ioniq to lock the car",
+            "Alexa, ask my ioniq to defrost the car"
+          ]
+        },
+        "en-GB": {
+          "name": "My Ioniq",
+          "summary": "Lock your Hyundai and start its climate.",
+          "description": "Private skill that locks your Hyundai and starts the climate or defroster through Bluelink.",
+          "examplePhrases": [
+            "Alexa, ask my ioniq to lock the car",
+            "Alexa, ask my ioniq to defrost the car"
+          ]
+        }
+      },
+      "isAvailableWorldwide": false,
+      "distributionCountries": [
+        "DK"
+      ],
+      "category": "SMART_HOME",
+      "testingInstructions": "Private skill. Not for certification."
+    },
+    "apis": {
+      "custom": {}
+    },
+    "manifestVersion": "1.0"
+  }
+}
